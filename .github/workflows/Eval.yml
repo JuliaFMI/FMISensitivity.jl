@@ -1,0 +1,48 @@
+name: Run PkgEval
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  actions: write # lets julia-actions/cache delete outdated caches
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1']
+        julia-arch: [x64]
+
+    steps:
+      # Required by PkgEval.jl, as xvfb runs into issues with Ubuntu 24 (see the ci.yml workflow of PkgEval.jl)
+      - name: "Allow unprivileged user namespaces"
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: "Check out repository"
+        uses: actions/checkout@v7
+
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@v3
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.julia-arch }}
+
+      - name: "Set up julia-cache"
+        uses: julia-actions/cache@v3
+
+      - name: "Build package"
+        uses: julia-actions/julia-buildpkg@v1
+
+      # Evaluates this checkout (not the registered release) the way PkgEval does, on Julia 1.10 (LTS)
+      - name: "Run PkgEval"
+        run: |
+          git clone https://github.com/JuliaCI/PkgEval.jl.git
+          julia --project=PkgEval.jl -e 'import Pkg; Pkg.instantiate()'
+          julia --project=PkgEval.jl PkgEval.jl/bin/test_package.jl --name=FMISensitivity --path=${{ github.workspace }} --julia=1.10
