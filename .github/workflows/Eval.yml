@@ -40,9 +40,11 @@ jobs:
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
 
-      # Evaluates this checkout (not the registered release) the way PkgEval does, on Julia 1.10 (LTS)
+      # Evaluates this checkout (not the registered release) the way PkgEval does, on the latest Julia release
+      # (`stable` = newest release; an exact version is needed otherwise, `--julia=1.10` would mean 1.10.0).
+      # The Julia LTS is covered by TestLTS.
       - name: "Run PkgEval"
         run: |
           git clone https://github.com/JuliaCI/PkgEval.jl.git
           julia --project=PkgEval.jl -e 'import Pkg; Pkg.instantiate()'
-          julia --project=PkgEval.jl PkgEval.jl/bin/test_package.jl --name=FMISensitivity --path=${{ github.workspace }} --julia=1.10
+          julia --project=PkgEval.jl PkgEval.jl/bin/test_package.jl --name=FMISensitivity --path=${{ github.workspace }} --julia=stable
