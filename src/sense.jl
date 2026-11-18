@@ -270,7 +270,9 @@ function ChainRulesCore.frule(
                     Δx;
                     accu = ∂dx,
                 )
-                c.solution.evals_∂ẋ_∂x += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂x += 1
+                end
             end
 
             if outputs
@@ -283,7 +285,9 @@ function ChainRulesCore.frule(
                     Δx;
                     accu = ∂y,
                 )
-                c.solution.evals_∂y_∂x += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂x += 1
+                end
             end
 
             if eventIndicators
@@ -296,7 +300,9 @@ function ChainRulesCore.frule(
                     Δx;
                     accu = ∂e,
                 )
-                c.solution.evals_∂e_∂x += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂x += 1
+                end
             end
         end
     end
@@ -306,17 +312,23 @@ function ChainRulesCore.frule(
         if inputs
             if derivatives
                 jvp!(c, :∂ẋ_∂u, dx_refs, u_refs, u, Δu; accu = ∂dx)
-                c.solution.evals_∂ẋ_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂u += 1
+                end
             end
 
             if outputs
                 jvp!(c, :∂y_∂u, y_refs, u_refs, u, Δu; accu = ∂y)
-                c.solution.evals_∂y_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂u += 1
+                end
             end
 
             if eventIndicators
                 jvp!(c, :∂e_∂u, (:indicators, ec_idcs), u_refs, u, Δu; accu = ∂e)
-                c.solution.evals_∂e_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂u += 1
+                end
             end
         end
     end
@@ -326,17 +338,23 @@ function ChainRulesCore.frule(
         if parameters
             if derivatives
                 jvp!(c, :∂ẋ_∂p, dx_refs, p_refs, p, Δp; accu = ∂dx)
-                c.solution.evals_∂ẋ_∂p += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂p += 1
+                end
             end
 
             if outputs
                 jvp!(c, :∂y_∂p, y_refs, p_refs, p, Δp; accu = ∂y)
-                c.solution.evals_∂y_∂p += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂p += 1
+                end
             end
 
             if eventIndicators
                 jvp!(c, :∂e_∂p, (:indicators, ec_idcs), p_refs, p, Δp; accu = ∂e)
-                c.solution.evals_∂e_∂p += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂p += 1
+                end
             end
         end
     end
@@ -346,17 +364,23 @@ function ChainRulesCore.frule(
         if times
             if derivatives
                 gvp!(c, :∂ẋ_∂t, dx_refs, :time, t, Δt; accu = ∂dx)
-                c.solution.evals_∂ẋ_∂t += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂t += 1
+                end
             end
 
             if outputs
                 gvp!(c, :∂y_∂t, y_refs, :time, t, Δt; accu = ∂y)
-                c.solution.evals_∂y_∂t += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂t += 1
+                end
             end
 
             if eventIndicators
                 gvp!(c, :∂e_∂t, (:indicators, ec_idcs), :time, t, Δt; accu = ∂e)
-                c.solution.evals_∂e_∂t += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂t += 1
+                end
             end
         end
     end
@@ -598,45 +622,61 @@ function ChainRulesCore.rrule(
         if derivatives
             if states
                 vjp!(c, :∂ẋ_∂x, dx_refs, x_refs, x, d̄x; accu = x̄)
-                c.solution.evals_∂ẋ_∂x += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂x += 1
+                end
                 #@info "t=$(t)\n\tx=$(x)\n\tx̄=$(x̄)\n\tmtx=$(c.∂ẋ_∂x.mtx)\n\tvjp=$(c.∂ẋ_∂x.vjp)\n\td̄x=$(d̄x)"
             end
 
             if inputs
                 vjp!(c, :∂ẋ_∂u, dx_refs, u_refs, u, d̄x; accu = ū)
-                c.solution.evals_∂ẋ_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂u += 1
+                end
             end
 
             if parameters
                 vjp!(c, :∂ẋ_∂p, dx_refs, p_refs, p, d̄x; accu = p̄)
-                c.solution.evals_∂ẋ_∂p += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂p += 1
+                end
             end
 
             if times && c.fmu.executionConfig.eval_t_gradients
                 vgp!(c, :∂ẋ_∂t, dx_refs, :time, t, d̄x; accu = t̄)
-                c.solution.evals_∂ẋ_∂t += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂ẋ_∂t += 1
+                end
             end
         end
 
         if outputs
             if states
                 vjp!(c, :∂y_∂x, y_refs, x_refs, x, ȳ; accu = x̄)
-                c.solution.evals_∂y_∂x += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂x += 1
+                end
             end
 
             if inputs
                 vjp!(c, :∂y_∂u, y_refs, u_refs, u, ȳ; accu = ū)
-                c.solution.evals_∂y_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂u += 1
+                end
             end
 
             if parameters
                 vjp!(c, :∂y_∂p, y_refs, p_refs, p, ȳ; accu = p̄)
-                c.solution.evals_∂y_∂p += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂p += 1
+                end
             end
 
             if times && c.fmu.executionConfig.eval_t_gradients
                 vgp!(c, :∂y_∂t, y_refs, :time, t, ȳ; accu = t̄)
-                c.solution.evals_∂y_∂t += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂y_∂t += 1
+                end
             end
         end
 
@@ -653,26 +693,35 @@ function ChainRulesCore.rrule(
         if _eventIndicators # ToDo: This should be `eventIndicators` but we get it for every ēc bc. of workaround in `condition!`
             if states
                 vjp!(c, :∂e_∂x, (:indicators, ec_idcs), x_refs, x, ēc; accu = x̄)
-                c.solution.evals_∂e_∂x += 1
-
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂x += 1
+                end
                 #@info "t=$(t)\nēc=$(ēc)"
             end
 
             if inputs
                 vjp!(c, :∂e_∂u, (:indicators, ec_idcs), u_refs, u, ēc; accu = ū)
-                c.solution.evals_∂e_∂u += 1
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂u += 1
+                end
             end
 
             if parameters
                 vjp!(c, :∂e_∂p, (:indicators, ec_idcs), p_refs, p, ēc; accu = p̄)
-                c.solution.evals_∂e_∂p += 1
+
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂p += 1
+                end
 
                 #@info "t=$(t)\nēc=$(ēc)"
             end
 
             if times && c.fmu.executionConfig.eval_t_gradients
                 vgp!(c, :∂e_∂t, (:indicators, ec_idcs), :time, t, ēc; accu = t̄)
-                c.solution.evals_∂e_∂t += 1
+
+                if !isnothing(c.solution)
+                    c.solution.evals_∂e_∂t += 1
+                end
             end
         end
 
@@ -1526,6 +1575,10 @@ function validate!(jac::FMUJacobian, x::AbstractVector)
 
     # only VR to VR value references can be sampled using built-in functions in FMI
     if !isa(jac.f_refs, Tuple) && !isa(jac.x_refs, Symbol)
+
+        @assert jac.instance.fmu.executionConfig.sensitivity_strategy ∈
+                (:FiniteDiff, :FMIDirectionalDerivative, :FMIAdjointDerivative) "Unknown sensitivity strategy `$(jac.instance.fmu.executionConfig.sensitivity_strategy)`."
+
         if jac.instance.fmu.executionConfig.sensitivity_strategy ==
            :FMIDirectionalDerivative && providesDirectionalDerivatives(jac.instance.fmu)
 
@@ -1562,7 +1615,7 @@ function validate!(jac::FMUJacobian, x::AbstractVector)
                     view(jac.mtx, 1:cols, i),
                 )
             end
-        elseif jac.instance.fmu.executionConfig.sensitivity_strategy == :FiniteDiff
+        else #if jac.instance.fmu.executionConfig.sensitivity_strategy == :FiniteDiff
 
             seed = zeros(getRealType(jac.instance), cols)
 
@@ -1579,9 +1632,8 @@ function validate!(jac::FMUJacobian, x::AbstractVector)
                     Δx = jac.instance.fmu.executionConfig.finitediff_absstep,
                 )
             end
-        else
-            @assert false "Unknown sensitivity strategy `$(jac.instance.fmu.executionConfig.sensitivity_strategy)`."
         end
+
     else
         finite_diff_jacobian!(jac, x)
     end
